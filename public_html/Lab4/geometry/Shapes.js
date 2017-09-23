@@ -77,7 +77,7 @@ Shapes.drawPrimitive = function (primitive, optional_arguments, include_wires) {
 	// Ruvim: I added an optional_arguments argument to accept the transformation matrix and/or color to use: 
 	if (typeof (optional_arguments) == "object") { 
 		if (optional_arguments.transform) 
-			gl.uniformMatrix4fv (uModel_view, false, _flatten (optional_arguments.transform)); 
+			gl.uniformMatrix4fv (uModel_view, false, flatten (optional_arguments.transform)); 
 		if (optional_arguments.color) 
 			gl.uniform4fv(uColor, optional_arguments.color); 
 	} 
