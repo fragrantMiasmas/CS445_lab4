@@ -82,8 +82,8 @@ function render()
    
     stack.push();
     
-    gl.uniform4fv(uColor, vec4(1.0, 1.0, 0.0, 1.0)); 
-    Shapes.drawPrimitive(Shapes.cube);
+    var unicycle1 = new Unicycle();
+    unicycle1.drawUnicycle();
     stack.pop();
    
 }
