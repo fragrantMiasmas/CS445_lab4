@@ -8,14 +8,16 @@
 
 var Shapes = {};   // set up Shapes namespace
 
-Shapes.cube = new Cube();  
-Shapes.axis = new Axis();
-// TO DO: ADD OTHER SHAPES
+Shapes.cube = new Cube();  // global
+Shapes.disk = new Disk(36);
+Shapes.cone = new Cone(36, 1.5);
+Shapes.cylinder = new Cylinder(48, 0.5);
 
 Shapes.initShapes = function () {
     Shapes.initBuffers(Shapes.cube);
-    // TO DO: ADD OTHER SHAPES
-    Shapes.axis.initBuffer();
+    Shapes.initBuffers(Shapes.disk);
+    Shapes.initBuffers(Shapes.cone);
+    Shapes.initBuffers(Shapes.cylinder);
 };
 
 
