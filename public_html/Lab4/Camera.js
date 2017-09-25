@@ -29,23 +29,23 @@ Camera.prototype.reset = function () {
     this.calcUVN();
 };
 
-Camera.prototype.exampleSetup = function(){
-    // All of this is to get the camera set properly. We will 
-    // learn about this in Lab 4
-    thetaY += 1.0;  // increase rotation about chosen axis
-    var eye = vec3(0.0, 7.0, 30.0);  // location of camera
-    var at = vec3(0, 7.0, 0);         // what the camera is looking at
-    var up = vec3(0, 1, 0);         // the camera's up direction
-    viewMat = lookAt(eye, at, up);  // view matrix
-    //var axisRot = rotateY(thetaY);  // rotation matrix for rotating around the y axis
-    var axisRot = rotateY(30);
-    viewMat = mult(viewMat, axisRot); // combine the view matrix with rotation matrix
-
-    // Calculate the projection matrix 
-    var projMat = perspective(60, canvas.width / canvas.height, 0.1, 500.);
-    // Set the value of the projection uniform variable in the shader
-    gl.uniformMatrix4fv(uProjection, false, flatten(projMat)); // set projection matrix
-}
+//Camera.prototype.exampleSetup = function(){
+//    // All of this is to get the camera set properly. We will 
+//    // learn about this in Lab 4 
+//    thetaY += 1.0;  // increase rotation about chosen axis
+//    var eye = vec3(0.0, 7.0, 30.0);  // location of camera
+//    var at = vec3(0, 7.0, 0);         // what the camera is looking at
+//    var up = vec3(0, 1, 0);         // the camera's up direction
+//    viewMat = lookAt(eye, at, up);  // view matrix
+//    //var axisRot = rotateY(thetaY);  // rotation matrix for rotating around the y axis
+//    var axisRot = rotateY(30);
+//    viewMat = mult(viewMat, axisRot); // combine the view matrix with rotation matrix
+//
+//    // Calculate the projection matrix 
+//    var projMat = perspective(60, canvas.width / canvas.height, 0.1, 500.);
+//    // Set the value of the projection uniform variable in the shader
+//    gl.uniformMatrix4fv(uProjection, false, flatten(projMat)); // set projection matrix
+//}
 
 /**
  * Calculate the *initial* viewRotation matrix of camera
@@ -56,11 +56,16 @@ Camera.prototype.calcUVN = function () {
     this.viewRotation = mat4(1);  // identity - placeholder only
 
 // TO DO:  COMPLETE THIS CODE
-//    var n = vec4(normalize(this.VPN, true));
-//    var u = ...
-//    
-//    var v = ...
-//    this.viewRotation = ...
+    var n = vec4(normalize(this.VPN, true));
+    var v = this.VUP;
+    var u = cross(v,n);
+    u.push(0); //append 0 to the end bc original code has vec3 instead of vec4
+    this.viewRotation = [
+        u,
+        v,
+        n,
+        [0,0,0,1],
+    ];
     this.viewRotation.matrix = true;
 };
 
@@ -72,8 +77,9 @@ Camera.prototype.calcUVN = function () {
 Camera.prototype.calcViewMat = function () {
     var mv = mat4(1);  // identity - placeholder only
 // TO DO:  COMPLETE THIS CODE
-//    var eyeTranslate = ...
-//    var mv = ...
+    var eyeTranslate = translate(-this.eye[0], -this.eye[1], -this.eye[2]);
+    
+    var mv = mult(eyeTranslate,this.viewRotation);
     return mv;
 };
 
@@ -165,7 +171,8 @@ Camera.prototype.tumble = function (rx, ry) {
 };
 
 Camera.prototype.keyAction = function (key) {
-    var alpha = 1.0;  // used to control the amount of a turn during the flythrough 
+    var alpha = 10.0;  // used to control the amount of a turn during the flythrough 
+    var s = 1;
     switch (key) {     // different keys should be used because these do thing sin browser
         case 'W':  // turn right - this is implemented
             console.log("turn right");
@@ -174,30 +181,40 @@ Camera.prototype.keyAction = function (key) {
         case 'E':   // turn left
             console.log("turn left");
             // IMPLEMENT
+            this.viewRotation = mult(rotateY(-alpha), this.viewRotation);
             break;
         case 'S':  // turn up   
             console.log(" turn up");
             // IMPLEMENT
+            this.viewRotation = mult(rotateX(alpha), this.viewRotation);
             break;
         case 'D':  // turn down
             console.log("turn down");
             // IMPLEMENT
+            this.viewRotation = mult(rotateX(-alpha), this.viewRotation);
             break;
         case 'X':  // bank right
             console.log("bank right");
             // IMPLEMENT
+            this.viewRotation = mult(rotateZ(alpha), this.viewRotation);
             break;
         case 'C':  // bank left
             console.log("bank left");
             // IMPLEMENT
+            this.viewRotation = mult(rotateZ(-alpha), this.viewRotation);
             break;
         case 'Q':  // move forward
             console.log("move forward");
             // IMPLEMENT
+//            this.viewRotation = scale(s, this.viewRotation[2]);
+            var an = scale(s, this.viewRotation[2]); //alpha * n
+            this.eye = subtract(this.eye, an); //order matters with subtract
             break;
         case 'A':  //  move backward
             console.log("move backward");
             // IMPLEMENT
+            var an = scale(s, this.viewRotation[2]); //alpha * n
+            this.eye = add(an, this.eye);
             break;
         case 'R':  //  reset
             console.log("reset");

@@ -12,12 +12,14 @@ Shapes.cube = new Cube();  // global
 Shapes.disk = new Disk(36);
 Shapes.cone = new Cone(36, 1.5);
 Shapes.cylinder = new Cylinder(48, 0.5);
+Shapes.axis = new Axis();
 
 Shapes.initShapes = function () {
     Shapes.initBuffers(Shapes.cube);
     Shapes.initBuffers(Shapes.disk);
     Shapes.initBuffers(Shapes.cone);
     Shapes.initBuffers(Shapes.cylinder);
+    Shapes.initBuffers(Shapes.axis);
 };
 
 
@@ -30,13 +32,14 @@ Shapes.initBuffers = function (primitive) {
     gl.bufferData(gl.ARRAY_BUFFER, flatten(primitive.vertices), gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, null); // done with this buffer
 
-
+if(primitive.colors){
     // SET UP ARRAY BUFFER FOR VERTEX COLORS 
     ////////////////////////////////////////////////////////////
     primitive.colorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, primitive.colorBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(primitive.colors), gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, null); // done with this buffer
+    }
 
     // CALCULATE EDGES FROM THE VERTICES FOR SHAPE OUTLINES 
     // Don't need to do this unless you want an outline 
