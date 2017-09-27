@@ -39,10 +39,11 @@ Camera.prototype.calcUVN = function () {
     this.viewRotation = mat4(1);  // identity - placeholder only
 
 // TO DO:  COMPLETE THIS CODE
-    var n = vec4(normalize(this.VPN, true));
-    var v = this.VUP;
-    var u = cross(v,n);
+    var n = vec4(normalize(normalize(this.VPN), true));
+    var u = cross(normalize(this.VUP),n);
+    var v = cross(n,u);
     u.push(0); //append 0 to the end bc original code has vec3 instead of vec4
+    v.push(0);
     this.viewRotation = [ //R^t
         u,
         v,
@@ -94,6 +95,7 @@ Camera.prototype.motion = function () {
 
 //          TO DO: NEED TO IMPLEMENT TUMBLE FUNCTION
             this.tumble(rx, ry);   //  <----  NEED TO IMPLEMENT THIS FUNCTION BELOW!!!
+            
             mouseState.startx = mouseState.x;
             mouseState.starty = mouseState.y;
             break;
@@ -101,7 +103,10 @@ Camera.prototype.motion = function () {
             var dx = -0.05 * mouseState.delx; // amount to pan along x
             var dy = 0.05 * mouseState.dely;  // amount to pan along y
             //  TO DO: NEED TO IMPLEMENT HERE
-            //  Calculate this.eye 
+//              Calculate this.eye 
+              var an = add(scale(dx, this.viewRotation[0]),
+              scale(dy, this.viewRotation[1])); //alpha * n
+            this.eye = add(this.eye, an); //order matters with subtract
             mouseState.startx = mouseState.x;
             mouseState.starty = mouseState.y;
             break;
@@ -110,6 +115,8 @@ Camera.prototype.motion = function () {
             var dy = 0.05 * mouseState.dely;
             //   TO DO: NEED TO IMPLEMENT HERE
             //  Calculate this.eye 
+            var an = scale(dy, this.viewRotation[2]); //alpha * n
+            this.eye = subtract(this.eye, an); //order matters with subtract
             mouseState.startx = mouseState.x;
             mouseState.starty = mouseState.y;
             break;
@@ -137,20 +144,36 @@ Camera.prototype.tumble = function (rx, ry) {
 
     // DO THIS CONTROL LAST - IT IS THE MOST DIFFICULT PART
     tumblePoint = vec4(0, 0, 0, 1);
-    var view = this.calcViewMat();  // current view matrix
-
+    var view_old = this.calcViewMat();  // current view matrix
+    var pc = vec4(0,0,0,1); //origin, point about which to rotate
+//    var npc = pc; // change to negative pc later
+    
+    var pcPrime = mult(view_old,pc);
+    
+    
+    
     // X Rotate about tumble point in Camera Coord Sys
-
+    var productx = mult(translate(pcPrime[0],pcPrime[1],pcPrime[2]), 
+    mult(rx, translate(-pcPrime[0], -pcPrime[1], -pcPrime[2])));
    
 
     // Y Rotate about tumble point in WCS
+    var producty = mult(translate(pc[0],pc[1], pc[2]), mult(ry,translate(-pc[0], -pc[1],-pc[2])));
     
-
+    
+    var view_new = mult(productx,mult(view_old, producty));
+    
     // need to get eye position back
     //  Here, rotInverse is the inverse of the rotational part of the view matrix.
     //  eye = -rotInverse*view*origin  -> this gives the location of the WCS origin in the eye coordinates
+   var view_transpose = transpose(view_new); //view new transpose
+   view_transpose[3] = vec4(0,0,0,1); //replace bottom row, rotation part transpose
    
+   this.viewRotation = transpose(view_transpose); 
    
+   var eye_translate = mult(view_transpose,view_new);
+   this.eye = vec4(-eye_translate[0][3], //zeroth row and column
+   -eye_translate[1][3], -eye_translate[2][3], 1);
 };
 
 Camera.prototype.keyAction = function (key) {
