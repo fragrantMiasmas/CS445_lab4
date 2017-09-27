@@ -23,18 +23,19 @@ function Cube() {
     this.colors = [this.numVertices];
     this.normals = [this.numVertices];
     this.texCoords = [this.numVertices];
-
+    
+    var scale = 0.5;
     // Local variables: unique vertices and colors.
     ////////////////////////////////////////////////////////////
     var unique_vertices = [
-        vec4(-1.0, -1.0, 1.0, 1.0),  // v0
-        vec4(1.0, -1.0, 1.0, 1.0),   // v1
-        vec4(-1.0, 1.0, 1.0, 1.0),   // v2
-        vec4(1.0, 1.0, 1.0, 1.0),    // v3
-        vec4(-1.0, -1.0, -1.0, 1.0), // v4
-        vec4(1.0, -1.0, -1.0, 1.0),  // v5
-        vec4(-1.0, 1.0, -1.0, 1.0),  // v6
-        vec4(1.0, 1.0, -1.0, 1.0)    // v7
+        vec4(-scale, -scale, scale, 1.0),  // v0
+        vec4(scale, -scale, scale, 1.0),   // v1
+        vec4(-scale, scale, scale, 1.0),   // v2
+        vec4(scale, scale, scale, 1.0),    // v3
+        vec4(-scale, -scale, -scale, 1.0), // v4
+        vec4(scale, -scale, -scale, 1.0),  // v5
+        vec4(-scale, scale, -scale, 1.0),  // v6
+        vec4(scale, scale, -scale, 1.0)    // v7
     ];
 
     var vert_colors = [

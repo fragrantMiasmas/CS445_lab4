@@ -29,23 +29,6 @@ Camera.prototype.reset = function () {
     this.calcUVN();
 };
 
-//Camera.prototype.exampleSetup = function(){
-//    // All of this is to get the camera set properly. We will 
-//    // learn about this in Lab 4 
-//    thetaY += 1.0;  // increase rotation about chosen axis
-//    var eye = vec3(0.0, 7.0, 30.0);  // location of camera
-//    var at = vec3(0, 7.0, 0);         // what the camera is looking at
-//    var up = vec3(0, 1, 0);         // the camera's up direction
-//    viewMat = lookAt(eye, at, up);  // view matrix
-//    //var axisRot = rotateY(thetaY);  // rotation matrix for rotating around the y axis
-//    var axisRot = rotateY(30);
-//    viewMat = mult(viewMat, axisRot); // combine the view matrix with rotation matrix
-//
-//    // Calculate the projection matrix 
-//    var projMat = perspective(60, canvas.width / canvas.height, 0.1, 500.);
-//    // Set the value of the projection uniform variable in the shader
-//    gl.uniformMatrix4fv(uProjection, false, flatten(projMat)); // set projection matrix
-//}
 
 /**
  * Calculate the *initial* viewRotation matrix of camera
@@ -60,7 +43,7 @@ Camera.prototype.calcUVN = function () {
     var v = this.VUP;
     var u = cross(v,n);
     u.push(0); //append 0 to the end bc original code has vec3 instead of vec4
-    this.viewRotation = [
+    this.viewRotation = [ //R^t
         u,
         v,
         n,
