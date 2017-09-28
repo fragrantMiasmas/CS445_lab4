@@ -58,7 +58,7 @@ Unicycle.prototype.drawWheel = function(){
     stack.push();
     stack.multiply(rotateZ(90));
     stack.multiply(scalem(this.wheelRad,this.wheelThick,this.wheelRad)); 
-    console.log("Plz work!");
+    // console.log("Plz work!");
     Shapes.drawPrimitive(Shapes.cylinder, { transform: stack.top (), color: this.wheelColor });
     stack.pop();
 }
