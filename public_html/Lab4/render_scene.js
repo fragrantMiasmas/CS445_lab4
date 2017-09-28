@@ -73,8 +73,8 @@ function render()
     // Need these 2 lines since camera is sitting at origin. 
     // Without them, you would be sitting inside the cube.
     // REMOVE once camera controls are working
-    stack.multiply(translate(0, 0, -10)); 
-    gl.uniformMatrix4fv(uModel_view, false, flatten(stack.top()));
+    // stack.multiply(translate(0, 0, -10)); 
+    // gl.uniformMatrix4fv(uModel_view, false, flatten(stack.top()));
     
     
     gl.uniformMatrix4fv(uModel_view, false, flatten(stack.top()));

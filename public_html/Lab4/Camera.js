@@ -90,8 +90,8 @@ Camera.prototype.motion = function () {
             var dy = -0.05 * mouseState.delx;  // angle around y due to mouse drag along x
             var dx = -0.05 * mouseState.dely;  // angle around x due to mouse drag along y
 
-            var ry = rotateY(10 * dy);  // rotation matrix around y
-            var rx = rotateX(10 * dx);  // rotation matrix around x
+            var ry = rotateY(1 * dy);  // rotation matrix around y
+            var rx = rotateX(1 * dx);  // rotation matrix around x
 
 //          TO DO: NEED TO IMPLEMENT TUMBLE FUNCTION
             this.tumble(rx, ry);   //  <----  NEED TO IMPLEMENT THIS FUNCTION BELOW!!!
@@ -169,11 +169,31 @@ Camera.prototype.tumble = function (rx, ry) {
    var view_transpose = transpose(view_new); //view new transpose
    view_transpose[3] = vec4(0,0,0,1); //replace bottom row, rotation part transpose
    
-   this.viewRotation = transpose(view_transpose); 
+   // this.viewRotation = transpose(view_transpose); 
    
    var eye_translate = mult(view_transpose,view_new);
    this.eye = vec4(-eye_translate[0][3], //zeroth row and column
    -eye_translate[1][3], -eye_translate[2][3], 1);
+   
+   var make_rounded_matrix_string = function (m) { 
+		var flat = flatten (m); // Make a 1D array for easier working with it (to avoid recursion, etc.) 
+		var result = []; 
+		for (var i = 0; i < flat.length; i++) { 
+			var roundString = "" + (Math.round (flat[i] * 100)); // Round everything to the nearest 0.01 
+			var isNegative = roundString.charAt (0) == '-'; 
+			if (isNegative) 
+				roundString = roundString.substring (1); // Take out the leading '-' (required before adding leading 0s). 
+			while (roundString.length < 3) roundString = "0" + roundString; // Add leading 0s if necessary (so, 001 rather than 1, etc.). 
+			// And the result is to change "001" to "0.01", "4834" to "48.34", etc. --> so add a "." before the last two digits: 
+			result.push ((isNegative ? "-" : "") + roundString.substring (0, roundString.length - 2) + "." + roundString.substring (roundString.length - 2)); 
+		} 
+		return result.toString (); 
+   }; 
+   
+   this.viewRotation = mult (mult (rx, this.viewRotation), ry); 
+   
+   // console.log (make_rounded_matrix_string (this.viewRotation) + " at " + make_rounded_matrix_string (this.eye)); 
+   // console.log (make_rounded_matrix_string (this.viewRotation)); 
 };
 
 Camera.prototype.keyAction = function (key) {
