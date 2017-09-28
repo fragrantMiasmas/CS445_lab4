@@ -169,7 +169,7 @@ Camera.prototype.tumble = function (rx, ry) {
    var view_transpose = transpose(view_new); //view new transpose
    view_transpose[3] = vec4(0,0,0,1); //replace bottom row, rotation part transpose
    
-   // this.viewRotation = transpose(view_transpose); 
+   this.viewRotation = transpose(view_transpose); 
    
    var eye_translate = mult(view_transpose,view_new);
    this.eye = vec4(-eye_translate[0][3], //zeroth row and column
@@ -190,7 +190,7 @@ Camera.prototype.tumble = function (rx, ry) {
 		return result.toString (); 
    }; 
    
-   this.viewRotation = mult (mult (rx, this.viewRotation), ry); 
+   // this.viewRotation = mult (mult (rx, this.viewRotation), ry); 
    
    // console.log (make_rounded_matrix_string (this.viewRotation) + " at " + make_rounded_matrix_string (this.eye)); 
    // console.log (make_rounded_matrix_string (this.viewRotation)); 
