@@ -126,6 +126,21 @@ Camera.prototype.motion = function () {
     render();
 };
 
+function make_rounded_matrix_string (m) { 
+	var flat = flatten (m); // Make a 1D array for easier working with it (to avoid recursion, etc.) 
+	var result = []; 
+	for (var i = 0; i < flat.length; i++) { 
+		var roundString = "" + (Math.round (flat[i] * 100)); // Round everything to the nearest 0.01 
+		var isNegative = roundString.charAt (0) == '-'; 
+		if (isNegative) 
+			roundString = roundString.substring (1); // Take out the leading '-' (required before adding leading 0s). 
+		while (roundString.length < 3) roundString = "0" + roundString; // Add leading 0s if necessary (so, 001 rather than 1, etc.). 
+		// And the result is to change "001" to "0.01", "4834" to "48.34", etc. --> so add a "." before the last two digits: 
+		result.push ((isNegative ? "-" : "") + roundString.substring (0, roundString.length - 2) + "." + roundString.substring (roundString.length - 2)); 
+	} 
+	return result.toString (); 
+} 
+
 /**
  * Rotate about the world coordinate system about y (left/right mouse drag) and/or 
  * about a line parallel to the camera's x-axis and going through the WCS origin 
@@ -135,32 +150,20 @@ Camera.prototype.motion = function () {
  * @return none
  */
 Camera.prototype.tumble = function (rx, ry) {
-    // TO DO:  IMPLEMENT THIS FUNCTION
-    // We want to rotate about the world coordinate system along a direction parallel to the
-    // camera's x axis. We first determine the coordinates of the WCS origin expressed in the eye coordinates.
-    // We then translate this point to the camera (origin in camera coordinates) and do a rotation about x.
-    // We then translate back. The result is then composed with the view matrix to give a new view matrix.
-    //  When done, should have new value for eye and viewRotation
+	// TO DO:  IMPLEMENT THIS FUNCTION
+	// We want to rotate about the world coordinate system along a direction parallel to the
+	// camera's x axis. We first determine the coordinates of the WCS origin expressed in the eye coordinates.
+	// We then translate this point to the camera (origin in camera coordinates) and do a rotation about x.
+	// We then translate back. The result is then composed with the view matrix to give a new view matrix.
+	//  When done, should have new value for eye and viewRotation
 
-    // DO THIS CONTROL LAST - IT IS THE MOST DIFFICULT PART
-    tumblePoint = vec4(0, 0, 0, 1);
-    var view_old = this.calcViewMat();  // current view matrix
-    var pc = vec4(0,0,0,1); //origin, point about which to rotate
-//    var npc = pc; // change to negative pc later
-    
-    var pcPrime = mult(view_old,pc);
-    
-    
-    
-    // X Rotate about tumble point in Camera Coord Sys
-    // var productx = mult(translate(pcPrime[0],pcPrime[1],pcPrime[2]), 
-    // mult(rx, translate(-pcPrime[0], -pcPrime[1], -pcPrime[2])));
-   
-
-    // // Y Rotate about tumble point in WCS
-    // var producty = mult(translate(pc[0],pc[1], pc[2]), mult(ry,translate(-pc[0], -pc[1],-pc[2])));
-    
-    
+	// DO THIS CONTROL LAST - IT IS THE MOST DIFFICULT PART
+	var view_old = this.calcViewMat ();  // current view matrix
+	
+	var pc = vec4 (0,0,0,1); //origin, point about which to rotate 
+	var pcPrime = mult (view_old, pc); 
+	
+	
 	// Vnew = T(Pc’) Rx T(-Pc’) Vold T(Pc) Ry T(-Pc) --------------- from the notes (CoordinateSystems.pdf) 
 	var view_new = multAll (
 		translate (pcPrime[0], pcPrime[1], pcPrime[2]), 
@@ -172,42 +175,40 @@ Camera.prototype.tumble = function (rx, ry) {
 		translate (-pc[0], -pc[1], -pc[2]) 
 	); 
 	
-    // var view_new = mult(productx,mult(view_old, producty));
-    
-    // need to get eye position back
-    //  Here, rotInverse is the inverse of the rotational part of the view matrix.
-    //  eye = -rotInverse*view*origin  -> this gives the location of the WCS origin in the eye coordinates
-   var view_transpose = transpose(view_new); //view new transpose
-   view_transpose[3] = vec4(0,0,0,1); //replace bottom row, rotation part transpose
-   
-   var view_rotate_inverse = view_transpose; // Create another variable, just so we're less confused reading on later. 
-   
-   this.viewRotation = transpose (view_rotate_inverse); 
-   
-   var eye_translate = mult(view_rotate_inverse, view_new); 
-   this.eye = vec4(-eye_translate[0][3], //zeroth row and column
-   -eye_translate[1][3], -eye_translate[2][3], 1);
-   
-   var make_rounded_matrix_string = function (m) { 
-		var flat = flatten (m); // Make a 1D array for easier working with it (to avoid recursion, etc.) 
-		var result = []; 
-		for (var i = 0; i < flat.length; i++) { 
-			var roundString = "" + (Math.round (flat[i] * 100)); // Round everything to the nearest 0.01 
-			var isNegative = roundString.charAt (0) == '-'; 
-			if (isNegative) 
-				roundString = roundString.substring (1); // Take out the leading '-' (required before adding leading 0s). 
-			while (roundString.length < 3) roundString = "0" + roundString; // Add leading 0s if necessary (so, 001 rather than 1, etc.). 
-			// And the result is to change "001" to "0.01", "4834" to "48.34", etc. --> so add a "." before the last two digits: 
-			result.push ((isNegative ? "-" : "") + roundString.substring (0, roundString.length - 2) + "." + roundString.substring (roundString.length - 2)); 
-		} 
-		return result.toString (); 
-   }; 
+	var rotate_inverse = transpose (view_new); // The inverse is just the transpose (assuming we take out the right column, which will be the bottom row after transpose ...) 
+	rotate_inverse[3] = vec4 (0, 0, 0, 1); // Take out the translate component by resetting the bottom row (i.e., used to be right column). 
+	
+	this.viewRotation = transpose (rotate_inverse); // Transpose again to get the original rotation thing. 
+	console.log (make_rounded_matrix_string (this.viewRotation)); 
+	
+	// need to get eye position back
+	//  Here, rotInverse is the inverse of the rotational part of the view matrix.
+	//  eye = -rotInverse*view*origin  -> this gives the location of the WCS origin in the eye coordinates
+	var eye_translate = mult (rotate_inverse, view_new); 
+	this.eye = vec4 (-eye_translate[0][3], -eye_translate[1][3], -eye_translate[2][3], 1); 
+};
+
+
+// Things to try for debugging: 
+// var make_rounded_matrix_string = function (m) { 
+		// var flat = flatten (m); // Make a 1D array for easier working with it (to avoid recursion, etc.) 
+		// var result = []; 
+		// for (var i = 0; i < flat.length; i++) { 
+			// var roundString = "" + (Math.round (flat[i] * 100)); // Round everything to the nearest 0.01 
+			// var isNegative = roundString.charAt (0) == '-'; 
+			// if (isNegative) 
+				// roundString = roundString.substring (1); // Take out the leading '-' (required before adding leading 0s). 
+			// while (roundString.length < 3) roundString = "0" + roundString; // Add leading 0s if necessary (so, 001 rather than 1, etc.). 
+			// // And the result is to change "001" to "0.01", "4834" to "48.34", etc. --> so add a "." before the last two digits: 
+			// result.push ((isNegative ? "-" : "") + roundString.substring (0, roundString.length - 2) + "." + roundString.substring (roundString.length - 2)); 
+		// } 
+		// return result.toString (); 
+   // }; 
    
    // this.viewRotation = mult (mult (rx, this.viewRotation), ry); 
    
    // console.log (make_rounded_matrix_string (this.viewRotation) + " at " + make_rounded_matrix_string (this.eye)); 
    // console.log (make_rounded_matrix_string (this.viewRotation)); 
-};
 
 Camera.prototype.keyAction = function (key) {
     var alpha = 10.0;  // used to control the amount of a turn during the flythrough 
