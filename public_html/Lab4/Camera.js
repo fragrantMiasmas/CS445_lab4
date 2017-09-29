@@ -168,7 +168,7 @@ Camera.prototype.tumble = function (rx, ry) {
 		translate (-pcPrime[0], -pcPrime[1], -pcPrime[2]), 
 		view_old, 
 		translate (pc[0], pc[1], pc[2]), 
-		rx, 
+		ry, 
 		translate (-pc[0], -pc[1], -pc[2]) 
 	); 
 	
