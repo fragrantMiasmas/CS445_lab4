@@ -301,6 +301,14 @@ function subtract(u, v)
 
 //----------------------------------------------------------------------------
 
+// Ruvim: 
+function multAll (/* many arguments */) { 
+	var result = arguments[0]; 
+	for (var i = 1; i < arguments.length; i++) 
+		result = mult (result, arguments[i]); 
+	return result; 
+} 
+
 function mult(u, v)
 {
     var result = [];
