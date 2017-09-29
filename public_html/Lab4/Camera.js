@@ -61,10 +61,9 @@ Camera.prototype.calcUVN = function () {
 Camera.prototype.calcViewMat = function () {
     var mv = mat4(1);  // identity - placeholder only
 // TO DO:  COMPLETE THIS CODE
-    var eyeTranslate = translate(-this.eye[0], -this.eye[1], -this.eye[2]);
-    
-    var mv = mult(eyeTranslate,this.viewRotation);
-    return mv;
+    var eyeTranslate = translate(-this.eye[0], -this.eye[1], -this.eye[2]); 
+    var mv = mult (this.viewRotation, eyeTranslate); 
+    return mv; 
 };
 
 /** 
