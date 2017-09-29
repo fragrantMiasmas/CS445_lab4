@@ -153,15 +153,26 @@ Camera.prototype.tumble = function (rx, ry) {
     
     
     // X Rotate about tumble point in Camera Coord Sys
-    var productx = mult(translate(pcPrime[0],pcPrime[1],pcPrime[2]), 
-    mult(rx, translate(-pcPrime[0], -pcPrime[1], -pcPrime[2])));
+    // var productx = mult(translate(pcPrime[0],pcPrime[1],pcPrime[2]), 
+    // mult(rx, translate(-pcPrime[0], -pcPrime[1], -pcPrime[2])));
    
 
-    // Y Rotate about tumble point in WCS
-    var producty = mult(translate(pc[0],pc[1], pc[2]), mult(ry,translate(-pc[0], -pc[1],-pc[2])));
+    // // Y Rotate about tumble point in WCS
+    // var producty = mult(translate(pc[0],pc[1], pc[2]), mult(ry,translate(-pc[0], -pc[1],-pc[2])));
     
     
-    var view_new = mult(productx,mult(view_old, producty));
+	// Vnew = T(Pc’) Rx T(-Pc’) Vold T(Pc) Ry T(-Pc) --------------- from the notes (CoordinateSystems.pdf) 
+	var view_new = multAll (
+		translate (pcPrime[0], pcPrime[1], pcPrime[2]), 
+		rx, 
+		translate (-pcPrime[0], -pcPrime[1], -pcPrime[2]), 
+		view_old, 
+		translate (pc[0], pc[1], pc[2]), 
+		rx, 
+		translate (-pc[0], -pc[1], -pc[2]) 
+	); 
+	
+    // var view_new = mult(productx,mult(view_old, producty));
     
     // need to get eye position back
     //  Here, rotInverse is the inverse of the rotational part of the view matrix.
@@ -169,9 +180,11 @@ Camera.prototype.tumble = function (rx, ry) {
    var view_transpose = transpose(view_new); //view new transpose
    view_transpose[3] = vec4(0,0,0,1); //replace bottom row, rotation part transpose
    
-   this.viewRotation = transpose(view_transpose); 
+   var view_rotate_inverse = view_transpose; // Create another variable, just so we're less confused reading on later. 
    
-   var eye_translate = mult(view_transpose,view_new);
+   this.viewRotation = transpose (view_rotate_inverse); 
+   
+   var eye_translate = mult(view_rotate_inverse, view_new); 
    this.eye = vec4(-eye_translate[0][3], //zeroth row and column
    -eye_translate[1][3], -eye_translate[2][3], 1);
    
