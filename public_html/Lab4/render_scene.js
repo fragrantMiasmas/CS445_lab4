@@ -9,6 +9,7 @@ var uModel_view;  //  shader uniform variable for model-view matrix
 var camera = new Camera(); 
 var stack = new MatrixStack();
 
+var thetaX = 0;
 window.onload = function init()
 {   
     //set Event Handlers
@@ -79,11 +80,17 @@ function render()
     
     gl.uniformMatrix4fv(uModel_view, false, flatten(stack.top()));
     Shapes.axis.draw();
+  
+//    stack.push();
+//    
+//    var unicycle1 = new Unicycle();
+//    unicycle1.drawUnicycle();
+//    stack.pop();
+
    
     stack.push();
-    
-    var unicycle1 = new Unicycle();
-    unicycle1.drawUnicycle();
+    var bb8 = new Bb8();
+    bb8.drawBb8();
     stack.pop();
    
 }

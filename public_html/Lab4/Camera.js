@@ -247,12 +247,14 @@ Camera.prototype.keyAction = function (key) {
             // IMPLEMENT
 //            this.viewRotation = scale(s, this.viewRotation[2]);
             var an = scale(s, this.viewRotation[2]); //alpha * n
+            thetaX -= 10;
             this.eye = subtract(this.eye, an); //order matters with subtract
             break;
         case 'A':  //  move backward
             console.log("move backward");
             // IMPLEMENT
             var an = scale(s, this.viewRotation[2]); //alpha * n
+            thetaX += 10;
             this.eye = add(an, this.eye);
             break;
         case 'R':  //  reset

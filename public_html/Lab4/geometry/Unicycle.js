@@ -8,7 +8,7 @@ function Unicycle(){
     this.topColor = vec4(1.0, 0.0, 0.0, 1.0); //red
     this.wheelColor = vec4(0.0, 1.0, 0.0, 1.0); //green
     this.pedalColor = vec4(0.0, 0.0, 1.0, 1.0); //blue
-    this.thetaX = 0;
+//    this.thetaX = 0;
 }
 
 Unicycle.prototype.drawSeat = function(){
@@ -51,7 +51,7 @@ Unicycle.prototype.connect = function(){
     //Beginning of rotation section
     stack.push();
     stack.multiply(translate(0,5,0));
-    stack.multiply(rotateX(this.thetaX));
+    stack.multiply(rotateX(thetaX));
 }
 Unicycle.prototype.drawWheel = function(){
      //Wheel
