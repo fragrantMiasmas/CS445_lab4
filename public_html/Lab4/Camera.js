@@ -89,8 +89,8 @@ Camera.prototype.motion = function () {
             var dy = -0.05 * mouseState.delx;  // angle around y due to mouse drag along x
             var dx = -0.05 * mouseState.dely;  // angle around x due to mouse drag along y
 
-            var ry = rotateY(1 * dy);  // rotation matrix around y
-            var rx = rotateX(1 * dx);  // rotation matrix around x
+            var ry = rotateY(10 * dy);  // rotation matrix around y //10 is the rotation increment
+            var rx = rotateX(10 * dx);  // rotation matrix around x
 
 //          TO DO: NEED TO IMPLEMENT TUMBLE FUNCTION
             this.tumble(rx, ry);   //  <----  NEED TO IMPLEMENT THIS FUNCTION BELOW!!!
@@ -178,7 +178,7 @@ Camera.prototype.tumble = function (rx, ry) {
 	rotate_inverse[3] = vec4 (0, 0, 0, 1); // Take out the translate component by resetting the bottom row (i.e., used to be right column). 
 	
 	this.viewRotation = transpose (rotate_inverse); // Transpose again to get the original rotation thing. 
-	console.log (make_rounded_matrix_string (this.viewRotation)); 
+//	console.log (make_rounded_matrix_string (this.viewRotation)); //for debugging purposes
 	
 	// need to get eye position back
 	//  Here, rotInverse is the inverse of the rotational part of the view matrix.
